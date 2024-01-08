@@ -5,6 +5,10 @@ import { Picker } from '@react-native-picker/picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const AddTask = ({ navigation }) => {
+  const handleGoBack = () => {
+    // Use navigation.goBack() when you want to go back
+    navigation.goBack();
+  };
   const [newTask, setNewTask] = useState('');
   const [dueDate, setDueDate] = useState('');
   const [priority, setPriority] = useState('Low');
@@ -20,6 +24,7 @@ const AddTask = ({ navigation }) => {
   
     try {
       // Get existing tasks from storage
+      const currentDate = new Date();
       const existingTasks = await AsyncStorage.getItem('tasks');
       const tasks = existingTasks ? JSON.parse(existingTasks) : [];
   
@@ -36,6 +41,7 @@ const AddTask = ({ navigation }) => {
             description,
           },
           id: Date.now(), // Add a unique ID to the task
+          addedOn: currentDate.toISOString(),
         },
       ];
   

@@ -2,11 +2,14 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
+import { Picker } from '@react-native-picker/picker';
 
 const ViewTask = ({ route }) => {
   const navigation = useNavigation();
   const [tasks, setTasks] = useState([]);
   const { taskTitle } = route.params || {};
+  const [selectedPriority, setSelectedPriority] = useState('All');
+  const [selectedStatus, setSelectedStatus] = useState('All');
 
   useEffect(() => {
     const loadTasks = async () => {
@@ -46,6 +49,7 @@ const ViewTask = ({ route }) => {
             const updatedTasks = tasks.filter((task) => task.id !== taskId);
             setTasks(updatedTasks);
             AsyncStorage.setItem('tasks', JSON.stringify(updatedTasks));
+            navigation.goBack();
           },
           style: 'destructive',
         },
@@ -54,31 +58,74 @@ const ViewTask = ({ route }) => {
     );
   };
 
+  const filterTasks = () => {
+    let filteredTasks = tasks;
+
+    if (selectedPriority !== 'All') {
+      filteredTasks = filteredTasks.filter((task) => task.details?.priority === selectedPriority);
+    }
+
+    if (selectedStatus !== 'All') {
+      filteredTasks = filteredTasks.filter((task) => task.details?.status === selectedStatus);
+    }
+
+    return filteredTasks;
+  };
+
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Tasks</Text><Text></Text>
+      <Text style={styles.title}>Tasks</Text>
+
+      <View style={styles.pickerContainer}>
+        <Picker
+          selectedValue={selectedPriority}
+          onValueChange={(itemValue) => setSelectedPriority(itemValue)}
+        >
+          <Picker.Item label="All" value="All" />
+          <Picker.Item label="High" value="High" />
+          <Picker.Item label="Medium" value="Medium" />
+          <Picker.Item label="Low" value="Low" />
+        </Picker>
+      </View>
+
+      <View style={styles.pickerContainer}>
+        <Picker
+          selectedValue={selectedStatus}
+          onValueChange={(itemValue) => setSelectedStatus(itemValue)}
+        >
+          <Picker.Item label="All" value="All" />
+          <Picker.Item label="New" value="New" />
+          <Picker.Item label="In Progress" value="In Progress" />
+          <Picker.Item label="Completed" value="Completed" />
+        </Picker>
+      </View>
+
       <ScrollView style={styles.scrollView}>
-        {tasks.slice().reverse().map((task, index) => (
-          <View key={index} style={styles.taskContainer}>
-            <View style={styles.taskDetails}>
-              <Text>Due Date: {task.details?.dueDate || 'N/A'}</Text>
-              <Text>Priority: {task.details?.priority || 'N/A'}</Text>
-              <Text>Category: {task.details?.category || 'N/A'}</Text>
-              <Text>Status: {task.details?.status || 'N/A'}</Text>
-              <Text>Title: {task.title}</Text>
-              <Text>Description: {task.details?.description || 'N/A'}</Text>
-            </View>
-            <View style={styles.taskActions}>
-              <TouchableOpacity onPress={() => handleEditTask(task.id)} style={styles.editButton}>
-                <Text style={styles.actionText}>Edit</Text>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={() => handleDeleteTask(task.id)} style={styles.deleteButton}>
-                <Text style={styles.actionText}>Delete</Text>
-              </TouchableOpacity>
-            </View>
+        {filterTasks().map((task, index) => (
+          <View key={index} style={styles.taskBox}>
+            <Text>Due Date: {task.details?.dueDate || 'N/A'}</Text>
+            <Text>Priority: {task.details?.priority || 'N/A'}</Text>
+            <Text>Category: {task.details?.category || 'N/A'}</Text>
+            <Text>Status: {task.details?.status || 'N/A'}</Text>
+            <Text>Title: {task.title}</Text>
+            <Text>Description: {task.details?.description || 'N/A'}</Text>
+
+            {/* Display the date and time of adding task */}
+            <Text style={styles.dateTime}>
+              Added on: {new Date(task.addedOn).toLocaleString()}
+            </Text>
+
+            {/* Edit and Delete options for each task */}
+            <TouchableOpacity onPress={() => handleEditTask(task.id)} style={styles.editButton}>
+              <Text style={styles.actionText}>Edit</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => handleDeleteTask(task.id)} style={styles.deleteButton}>
+              <Text style={styles.actionText}>Delete</Text>
+            </TouchableOpacity>
           </View>
         ))}
       </ScrollView>
+
       <TouchableOpacity onPress={navigateToAddTask} style={styles.addTaskButton}>
         <Text style={styles.actionText}>Add Task</Text>
       </TouchableOpacity>
@@ -90,47 +137,29 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    
   },
   title: {
     fontSize: 20,
     fontWeight: 'bold',
     marginBottom: 10,
-    textAlign: 'center',
+  },
+  pickerContainer: {
+    marginBottom: 10,
   },
   scrollView: {
     flex: 1,
     marginBottom: 20,
   },
-  taskContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    backgroundColor: '#f9f9f9',
+  taskBox: {
+    backgroundColor: '#f0f0f0',
     padding: 15,
-    marginBottom: 15,
-    borderRadius: 10,
-    borderWidth: 1, // Add this line to set border width
-    borderColor: '#333', // Add this line to set border color
-    borderLeftWidth: 5, // Add this line to set left border width
-    borderLeftColor: 'darkgreen', // Add this line to set left border color
-    borderRightWidth: 5, // Add this line to set right border width
-    borderRightColor: 'darkgreen', // Add this line to set right border color
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
+    marginBottom: 10,
+    borderRadius: 5,
   },
-  taskDetails: {
-    flex: 1,
-  },
-  taskActions: {
-    marginLeft: 10,
-    alignItems: 'flex-end',
+  dateTime: {
+    fontSize: 12,
+    color: 'gray',
+    marginTop: 5,
   },
   editButton: {
     backgroundColor: 'green',
@@ -147,9 +176,6 @@ const styles = StyleSheet.create({
     marginVertical: 5,
   },
   addTaskButton: {
-    position: 'absolute',
-    top: 20,
-    right: 20,
     backgroundColor: 'blue',
     padding: 10,
     borderRadius: 5,
