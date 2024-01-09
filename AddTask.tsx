@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { View, TextInput, TouchableOpacity, Text, StyleSheet, Alert } from 'react-native';
-import { Picker } from '@react-native-picker/picker';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Picker } from '@react-native-picker/picker';
+import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import moment from 'moment';
 
 const AddTask = ({ navigation }) => {
@@ -11,6 +12,20 @@ const AddTask = ({ navigation }) => {
   const [category, setCategory] = useState('');
   const [status, setStatus] = useState('New');
   const [description, setDescription] = useState('');
+  const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+
+  const showDatePicker = () => {
+    setDatePickerVisibility(true);
+  };
+
+  const hideDatePicker = () => {
+    setDatePickerVisibility(false);
+  };
+
+  const handleConfirm = (date) => {
+    setDueDate(moment(date).format('YYYY-MM-DD'));
+    hideDatePicker();
+  };
 
   const addTask = async () => {
     if (!newTask.trim()) {
@@ -33,19 +48,21 @@ const AddTask = ({ navigation }) => {
         dateTime: moment().format('YYYY-MM-DD HH:mm:ss'),
       };
 
-      const updatedTasks = [
-        ...tasks,
-        {
-          title: newTask,
-          details: newTaskDetails,
-        },
-      ];
+      const newTaskObject = {
+        id: Date.now().toString(), // Generate a unique ID for the task
+        title: newTask,
+        details: newTaskDetails,
+      };
+
+      const updatedTasks = [...tasks, newTaskObject];
 
       // Save updated tasks to storage
       await AsyncStorage.setItem('tasks', JSON.stringify(updatedTasks));
 
       // Navigate to ViewTask screen with the new task title
       navigation.navigate('ViewTask', { taskTitle: newTask });
+      
+      // Clear input fields after adding task
       setNewTask('');
       setDueDate('');
       setPriority('Low');
@@ -59,17 +76,21 @@ const AddTask = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
+      <Text style={styles.title}>Add Task</Text>
       <TextInput
         style={styles.input}
         placeholder="Enter task title"
         value={newTask}
         onChangeText={(text) => setNewTask(text)}
       />
-      <TextInput
-        style={styles.input}
-        placeholder="Enter due date"
-        value={dueDate}
-        onChangeText={(text) => setDueDate(text)}
+      <TouchableOpacity style={styles.input} onPress={showDatePicker}>
+        <Text>{dueDate ? `Due Date: ${dueDate}` : 'Select due date'}</Text>
+      </TouchableOpacity>
+      <DateTimePickerModal
+        isVisible={isDatePickerVisible}
+        mode="date"
+        onConfirm={handleConfirm}
+        onCancel={hideDatePicker}
       />
       <Picker
         style={styles.input}
@@ -113,12 +134,17 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
   },
+  title: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 20,
+  },
   input: {
     height: 40,
     borderColor: 'gray',
     borderWidth: 1,
-    marginBottom: 10,
-    paddingHorizontal: 10,
+    marginBottom: 20,
+    padding: 10,
   },
   addButton: {
     backgroundColor: 'blue',

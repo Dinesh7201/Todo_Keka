@@ -37,7 +37,7 @@ const ViewTask = ({ route }) => {
     navigation.navigate('EditTask', { taskId });
   };
 
-  const handleDeleteTask = (taskId) => {
+  const handleDeleteTask = async (taskId) => {
     Alert.alert(
       'Delete Task',
       'Are you sure you want to delete this task?',
@@ -48,11 +48,23 @@ const ViewTask = ({ route }) => {
         },
         {
           text: 'Delete',
-          onPress: () => {
-            const updatedTasks = tasks.filter((task) => task.id !== taskId);
-            setTasks(updatedTasks);
-            AsyncStorage.setItem('tasks', JSON.stringify(updatedTasks));
-            navigation.goBack();
+          onPress: async () => {
+            try {
+              // Get existing tasks from storage
+              const existingTasks = await AsyncStorage.getItem('tasks');
+              const tasks = existingTasks ? JSON.parse(existingTasks) : [];
+  
+              // Remove the task with the specified ID
+              const updatedTasks = tasks.filter((task) => task.id !== taskId);
+  
+              // Save updated tasks to storage
+              await AsyncStorage.setItem('tasks', JSON.stringify(updatedTasks));
+  
+              // Update the state to re-render the component
+              setTasks(updatedTasks);
+            } catch (error) {
+              console.error('Error deleting task:', error);
+            }
           },
           style: 'destructive',
         },
@@ -60,7 +72,7 @@ const ViewTask = ({ route }) => {
       { cancelable: false }
     );
   };
-
+  
   const filterTasks = () => {
     let filteredTasks = tasks;
 
@@ -109,35 +121,34 @@ const ViewTask = ({ route }) => {
         {filterTasks().map((task) => (
           <View key={task.id} style={styles.taskBox}>
             <View style={styles.row}>
-  <Text style={styles.label}>Due Date:</Text>
-  <Text>{task.details?.dueDate || 'N/A'}</Text>
-</View>
+              <Text style={styles.label}>Due Date:</Text>
+              <Text style={styles.text}>{task.details?.dueDate || 'N/A'}</Text>
+            </View>
 
-<View style={styles.row}>
-  <Text style={styles.label}>Priority:</Text>
-  <Text style={styles.text}>{task.details?.priority || 'N/A'}</Text>
-</View>
+            <View style={styles.row}>
+              <Text style={styles.label}>Priority:</Text>
+              <Text style={styles.text}>{task.details?.priority || 'N/A'}</Text>
+            </View>
 
-<View style={styles.row}>
-  <Text style={styles.label}>Category:</Text>
-  <Text style={styles.text}>{task.details?.category || 'N/A'}</Text>
-</View>
+            <View style={styles.row}>
+              <Text style={styles.label}>Category:</Text>
+              <Text style={styles.text}>{task.details?.category || 'N/A'}</Text>
+            </View>
 
-<View style={styles.row}>
-  <Text style={styles.label}>Status:</Text>
-  <Text style={styles.text}>{task.details?.status || 'N/A'}</Text>
-</View>
+            <View style={styles.row}>
+              <Text style={styles.label}>Status:</Text>
+              <Text style={styles.text}>{task.details?.status || 'N/A'}</Text>
+            </View>
 
-<View style={styles.row}>
-  <Text style={styles.label}>Title:</Text>
-  <Text style={styles.text}>{task.title}</Text>
-</View>
+            <View style={styles.row}>
+              <Text style={styles.label}>Title:</Text>
+              <Text style={styles.text}>{task.title}</Text>
+            </View>
 
-<View style={styles.row}>
-  <Text style={styles.label}>Description:</Text>
-  <Text style={styles.text}>{task.details?.description || 'N/A'}</Text>
-</View>
-
+            <View style={styles.row}>
+              <Text style={styles.label}>Description:</Text>
+              <Text style={styles.text}>{task.details?.description || 'N/A'}</Text>
+            </View>
 
             <View style={styles.editDeleteContainer}>
               <TouchableOpacity onPress={() => handleEditTask(task.id)} style={styles.editButton}>
@@ -156,7 +167,7 @@ const ViewTask = ({ route }) => {
         ))}
       </ScrollView>
 
-      {/* Add Task button at top right corner */}
+      {/* Add Task button at the top right corner */}
       <TouchableOpacity onPress={navigateToAddTask} style={styles.addTaskButton}>
         <Text style={styles.actionText}>Add Task</Text>
       </TouchableOpacity>
@@ -191,17 +202,16 @@ const styles = StyleSheet.create({
   },
   row: {
     flexDirection: 'row',
-    alignItems: 'baseline', // Align items at the baseline for vertical alignment
+    alignItems: 'baseline',
   },
   label: {
     fontWeight: 'bold',
     marginRight: 5,
   },
   text: {
-    marginTop: 5, // Adjust the marginTop as needed
+    marginTop: 5,
+    color: 'black', // Set text color to black
   },
-  
-  
   editButton: {
     backgroundColor: 'green',
     padding: 10,
