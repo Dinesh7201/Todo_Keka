@@ -8,9 +8,9 @@ import moment from 'moment';
 const AddTask = ({ navigation }) => {
   const [newTask, setNewTask] = useState('');
   const [dueDate, setDueDate] = useState('');
-  const [priority, setPriority] = useState('Low');
+  const [priority, setPriority] = useState('');
   const [category, setCategory] = useState('');
-  const [status, setStatus] = useState('New');
+  const [status, setStatus] = useState('');
   const [description, setDescription] = useState('');
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
 
@@ -28,17 +28,19 @@ const AddTask = ({ navigation }) => {
   };
 
   const addTask = async () => {
-    if (!newTask.trim()) {
-      Alert.alert('Mandatory Field', 'Please fill in the task title.');
+    console.log('Inside addTask');
+  
+    // Check for mandatory fields
+    if (!newTask.trim() || !priority || !status || !dueDate) {
+      Alert.alert('Mandatory Fields', 'Please fill in the task title, select a priority, select Due Date and select a status.');
       return;
     }
+  
 
+  
     try {
-      // Get existing tasks from storage
       const existingTasks = await AsyncStorage.getItem('tasks');
       const tasks = existingTasks ? JSON.parse(existingTasks) : [];
-
-      // Add the new task with the current date and time
       const newTaskDetails = {
         dueDate,
         priority,
@@ -47,85 +49,91 @@ const AddTask = ({ navigation }) => {
         description,
         dateTime: moment().format('YYYY-MM-DD HH:mm:ss'),
       };
-
+  
       const newTaskObject = {
-        id: Date.now().toString(), // Generate a unique ID for the task
+        id: Date.now().toString(),
         title: newTask,
         details: newTaskDetails,
       };
-
+  
       const updatedTasks = [...tasks, newTaskObject];
-
-      // Save updated tasks to storage
       await AsyncStorage.setItem('tasks', JSON.stringify(updatedTasks));
-
-      // Navigate to the ViewTask screen with the new task title
       navigation.navigate('ViewTask', { taskTitle: newTask });
-
-      // Clear input fields after adding the task
       setNewTask('');
       setDueDate('');
-      setPriority('Low');
+      setPriority('');
       setCategory('');
-      setStatus('New');
+      setStatus('');
       setDescription('');
     } catch (error) {
       console.error('Error adding task:', error);
     }
   };
-
+  
+  
+  
   return (
     <ImageBackground
-      source={require('/Users/apple/Desktop/Todo_Keka/BackGround.png')} // Replace 'your-image-path' with the actual path to your image
+      source={require('/Users/apple/Desktop/Todo_Keka/BackGround.png')}
       style={styles.container}
     >
       <Text style={styles.title}>Add Task</Text>
+
       <TextInput
         style={styles.input}
         placeholder="Enter task title"
         value={newTask}
         onChangeText={(text) => setNewTask(text)}
       />
-      <TouchableOpacity style={styles.input} onPress={showDatePicker}>
-        <Text>{dueDate ? `Due Date: ${dueDate}` : 'Select due date'}</Text>
-      </TouchableOpacity>
-      <DateTimePickerModal
-        isVisible={isDatePickerVisible}
-        mode="date"
-        onConfirm={handleConfirm}
-        onCancel={hideDatePicker}
-      />
-      <Picker
-        style={styles.input}
-        selectedValue={priority}
-        onValueChange={(itemValue) => setPriority(itemValue)}
-      >
-        <Picker.Item label="Low" value="Low" />
-        <Picker.Item label="Medium" value="Medium" />
-        <Picker.Item label="High" value="High" />
-      </Picker>
-      <TextInput
-        style={styles.input}
-        placeholder="Enter category"
-        value={category}
-        onChangeText={(text) => setCategory(text)}
-      />
-      <Picker
-        style={styles.input}
-        selectedValue={status}
-        onValueChange={(itemValue) => setStatus(itemValue)}
-      >
-        <Picker.Item label="New" value="New" />
-        <Picker.Item label="In Progress" value="In Progress" />
-        <Picker.Item label="Completed" value="Completed" />
-      </Picker>
+
       <TextInput
         style={styles.input}
         placeholder="Enter task description"
         value={description}
         onChangeText={(text) => setDescription(text)}
       />
-      <TouchableOpacity onPress={addTask} style={styles.addButton}>
+
+      <TouchableOpacity style={styles.input} onPress={showDatePicker}>
+        <Text>{dueDate ? `Due Date: ${dueDate}` : 'Select due date'}</Text>
+      </TouchableOpacity>
+
+      <TextInput
+        style={styles.input}
+        placeholder="Enter category"
+        value={category}
+        onChangeText={(text) => setCategory(text)}
+      />
+
+      <Picker
+        style={styles.input}
+        selectedValue={priority}
+        onValueChange={(itemValue) => setPriority(itemValue)}
+      >
+        <Picker.Item label="Select Priority" value="" />
+        <Picker.Item label="High Priority" value="High" />
+        <Picker.Item label="Medium Priority" value="Medium" />
+        <Picker.Item label="Low Priority" value="Low" />
+      </Picker>
+
+      <Picker
+        style={styles.input}
+        selectedValue={status}
+        onValueChange={(itemValue) => setStatus(itemValue)}
+      >
+        <Picker.Item label="Select Status" value="" />
+        <Picker.Item label="New" value="New" />
+        <Picker.Item label="In Progress" value="In Progress" />
+        <Picker.Item label="Completed" value="Completed" />
+      </Picker>
+
+      <DateTimePickerModal
+        isVisible={isDatePickerVisible}
+        mode="date"
+        onConfirm={handleConfirm}
+        onCancel={hideDatePicker}
+      />
+
+      <TouchableOpacity onPress={addTask} style={styles.addButton} >
         <Text style={styles.actionText}>Add Task</Text>
       </TouchableOpacity>
     </ImageBackground>
@@ -138,16 +146,16 @@ const styles = StyleSheet.create({
     padding: 20,
     justifyContent: 'center',
     alignItems: 'center',
-    resizeMode: 'cover', // or 'stretch' for different cover behaviors
+    resizeMode: 'cover',
   },
   title: {
     fontSize: 20,
     fontWeight: 'bold',
     marginBottom: 20,
-    color: 'white', // Set text color to white
+    color: 'white',
   },
   input: {
-    backgroundColor: 'rgba(255, 255, 255, 0.8)', // Use rgba to set a transparent background color
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
     borderRadius: 5,
     padding: 10,
     marginBottom: 10,
