@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Alert, ImageBackground } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Alert, ImageBackground , Image} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import { Picker } from '@react-native-picker/picker';
@@ -95,11 +95,15 @@ const ViewTask = ({ route }) => {
 
   return (
     <ImageBackground
-      source={require('/Users/apple/Desktop/Todo_Keka/BackGround.jpeg')} // Replace './path/to/your/image.jpg' with the actual path to your JPEG image
+      source={require('/Users/apple/Desktop/Todo_Keka/BackGround.png')} // Replace './path/to/your/image.jpg' with the actual path to your JPEG image
       style={styles.container}
     >
+      <Image
+        source={require('/Users/apple/Desktop/Todo_Keka/logo.png')} // Replace with the actual path to your logo
+        style={styles.logo}
+      />
       <Text style={styles.title}>Tasks</Text>
-
+<Text></Text>
       {/* Priority Picker */}
       <View style={styles.pickerContainer}>
   <Picker
@@ -215,11 +219,19 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
   },
+  logo: {
+    width: 50, // Adjust the width as needed
+    height: 50, // Adjust the height as needed
+    position: 'absolute',
+    top: 20,
+    left: 20,
+  },
   title: {
     fontSize: 20,
     fontWeight: 'bold',
     marginBottom: 10,
     color: 'white',
+    textAlign: 'center',
   },
   pickerContainer: {
     marginBottom: 10,
