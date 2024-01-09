@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Alert, ImageBackground } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Alert, ImageBackground  } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import { Picker } from '@react-native-picker/picker';
@@ -11,7 +11,6 @@ const ViewTask = ({ route }) => {
   const { taskTitle } = route.params || {};
   const [selectedPriority, setSelectedPriority] = useState('All');
   const [selectedStatus, setSelectedStatus] = useState('All');
-  const [sortOrder, setSortOrder] = useState('latest');
 
   useEffect(() => {
     const loadTasks = async () => {
@@ -51,10 +50,17 @@ const ViewTask = ({ route }) => {
           text: 'Delete',
           onPress: async () => {
             try {
+              // Get existing tasks from storage
               const existingTasks = await AsyncStorage.getItem('tasks');
               const tasks = existingTasks ? JSON.parse(existingTasks) : [];
+  
+              // Remove the task with the specified ID
               const updatedTasks = tasks.filter((task) => task.id !== taskId);
+  
+              // Save updated tasks to storage
               await AsyncStorage.setItem('tasks', JSON.stringify(updatedTasks));
+  
+              // Update the state to re-render the component
               setTasks(updatedTasks);
             } catch (error) {
               console.error('Error deleting task:', error);
@@ -66,12 +72,8 @@ const ViewTask = ({ route }) => {
       { cancelable: false }
     );
   };
-
-  const handleSortOrderChange = (order) => {
-    setSortOrder(order);
-  };
-
-  const filterAndSortTasks = () => {
+  
+  const filterTasks = () => {
     let filteredTasks = tasks;
 
     if (selectedPriority !== 'All') {
@@ -80,14 +82,6 @@ const ViewTask = ({ route }) => {
 
     if (selectedStatus !== 'All') {
       filteredTasks = filteredTasks.filter((task) => task.details?.status === selectedStatus);
-    }
-
-    if (sortOrder === 'latest') {
-      filteredTasks = filteredTasks.sort((a, b) => moment(b.dateAdded) - moment(a.dateAdded));
-    } else if (sortOrder === 'dueDateTop') {
-      filteredTasks = filteredTasks.sort((a, b) => moment(a.details?.dueDate) - moment(b.details?.dueDate));
-    } else if (sortOrder === 'dueDateBottom') {
-      filteredTasks = filteredTasks.sort((a, b) => moment(b.details?.dueDate) - moment(a.details?.dueDate));
     }
 
     return filteredTasks;
@@ -102,64 +96,40 @@ const ViewTask = ({ route }) => {
 
       {/* Priority Picker */}
       <View style={styles.pickerContainer}>
-  <Picker
-    selectedValue={selectedPriority}
-    onValueChange={(itemValue) => setSelectedPriority(itemValue)}
-    style={styles.whitePicker}
-  >
-    <Picker.Item label="Select Priority" value="All" />
-    <Picker.Item label="High" value="High" />
-    <Picker.Item label="Medium" value="Medium" />
-    <Picker.Item label="Low" value="Low" />
-  </Picker>
-</View>
+        <Picker
+          selectedValue={selectedPriority}
+          onValueChange={(itemValue) => setSelectedPriority(itemValue)}
+          style={styles.whitePicker}
+        >
+          <Picker.Item label="All" value="All" />
+          <Picker.Item label="High" value="High" />
+          <Picker.Item label="Medium" value="Medium" />
+          <Picker.Item label="Low" value="Low" />
+        </Picker>
+      </View>
 
-{/* Status Picker */}
-<View style={styles.pickerContainer}>
-  <Picker
-    selectedValue={selectedStatus}
-    onValueChange={(itemValue) => setSelectedStatus(itemValue)}
-    style={styles.whitePicker}
-  >
-    <Picker.Item label="Select Status" value="All" />
-    <Picker.Item label="New" value="New" />
-    <Picker.Item label="In Progress" value="In Progress" />
-    <Picker.Item label="Completed" value="Completed" />
-  </Picker>
-</View>
-
-      {/* Sorting options */}
-      <View style={styles.sortOptionsContainer}>
-  <Text style={styles.sortLabel}>Sort by Due Date:</Text>
-  <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-    <TouchableOpacity
-      onPress={() => handleSortOrderChange('latest')}
-      style={[styles.sortButton, sortOrder === 'latest' && styles.activeSortButton]}
-    >
-      <Text style={styles.sortButtonText}>Latest Entry</Text>
-    </TouchableOpacity>
-    <TouchableOpacity
-      onPress={() => handleSortOrderChange('dueDateTop')}
-      style={[styles.sortButton, sortOrder === 'dueDateTop' && styles.activeSortButton]}
-    >
-      <Text style={styles.sortButtonText}>Due Date (Top)</Text>
-    </TouchableOpacity>
-    <TouchableOpacity
-      onPress={() => handleSortOrderChange('dueDateBottom')}
-      style={[styles.sortButton, sortOrder === 'dueDateBottom' && styles.activeSortButton]}
-    >
-      <Text style={styles.sortButtonText}>Due Date (Bottom)</Text>
-    </TouchableOpacity>
-  </ScrollView>
-</View>
+      {/* Status Picker */}
+      <View style={styles.pickerContainer}>
+        <Picker
+          selectedValue={selectedStatus}
+          onValueChange={(itemValue) => setSelectedStatus(itemValue)}
+          style={styles.whitePicker}
+        >
+          <Picker.Item label="All" value="All" />
+          <Picker.Item label="New" value="New" />
+          <Picker.Item label="In Progress" value="In Progress" />
+          <Picker.Item label="Completed" value="Completed" />
+        </Picker>
+      </View>
 
       <ScrollView style={styles.scrollView}>
-        {filterAndSortTasks().map((task) => (
+        {filterTasks().map((task) => (
           <View key={task.id} style={styles.taskBox}>
-            <View style={styles.row}>
-            
-              <Text style={styles.textTitle}>{task.title}</Text>
+            {/* Title Box */}
+            <View style={styles.titleBox}>
+              <Text style={styles.titleText}>{task.title}</Text>
             </View>
+
             <View style={styles.row}>
               <Text style={styles.label}>Due Date:</Text>
               <Text style={styles.text}>{task.details?.dueDate || 'N/A'}</Text>
@@ -180,7 +150,10 @@ const ViewTask = ({ route }) => {
               <Text style={styles.text}>{task.details?.status || 'N/A'}</Text>
             </View>
 
-            
+            <View style={styles.row}>
+              <Text style={styles.label}>Title:</Text>
+              <Text style={styles.text}>{task.title}</Text>
+            </View>
 
             <View style={styles.row}>
               <Text style={styles.label}>Description:</Text>
@@ -196,6 +169,7 @@ const ViewTask = ({ route }) => {
               </TouchableOpacity>
             </View>
 
+            {/* Display date added at the bottom right corner */}
             <Text style={styles.dateTime}>
               Added on: {task.details?.dateTime || 'N/A'}
             </Text>
@@ -203,10 +177,11 @@ const ViewTask = ({ route }) => {
         ))}
       </ScrollView>
 
+      {/* Add Task button at the top right corner */}
       <TouchableOpacity onPress={navigateToAddTask} style={styles.addTaskButton}>
         <Text style={styles.actionText}>Add Task</Text>
       </TouchableOpacity>
-    </ImageBackground>
+      </ImageBackground>
   );
 };
 
@@ -219,16 +194,14 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     marginBottom: 10,
-    color: 'white',
+    color: 'white'
   },
   pickerContainer: {
     marginBottom: 10,
-
   },
   whitePicker: {
     backgroundColor: 'white', // Set the background color to white
   },
-
   scrollView: {
     flex: 1,
     marginBottom: 20,
@@ -241,6 +214,20 @@ const styles = StyleSheet.create({
     borderColor: '#333',
     borderWidth: 1,
   },
+  titleBox: {
+    backgroundColor: 'blue', // Set the background color for the title box
+    padding: 10,
+    borderRadius: 5,
+    marginBottom: 0, // Remove the bottom margin
+    alignItems: 'center', // Center the text horizontally
+    borderBottomWidth: 1, // Add a border at the bottom of the title box
+    borderBottomColor: 'white', // Set the color of the border
+  },
+  titleText: {
+    color: 'white', // Set the text color for the title
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
   row: {
     flexDirection: 'row',
     alignItems: 'baseline',
@@ -251,12 +238,7 @@ const styles = StyleSheet.create({
   },
   text: {
     marginTop: 5,
-    color: 'black',
-  },
-  textTitle: {
-    marginTop: 5,
-    color: 'black',
-    fontSize: 23
+    color: 'black', // Set text color to black
   },
   editButton: {
     backgroundColor: 'green',
@@ -294,33 +276,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     marginTop: 10,
     textAlign: 'right',
-  },
-  sortOptionsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 10,
-    
-  },
-  sortLabel: {
-    color: 'white',
-    fontWeight: 'bold',
-    
-  },
-  sortButtonsContainer: {
-    flexDirection: 'row',
-    backgroundColor: 'white',
-  },
-  sortButton: {
-    backgroundColor: 'rgba(255, 255, 255, 0.5)',
-    padding: 5,
-    borderRadius: 5,
-    marginHorizontal: 5,
-  },
-  sortButtonText: {
-    color: 'white',
-  },
-  activeSortButton: {
-    backgroundColor: 'rgba(255, 255, 255, 0.8)',
   },
 });
 
