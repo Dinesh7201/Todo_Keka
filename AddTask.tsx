@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ImageBackground } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ImageBackground } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Picker } from '@react-native-picker/picker';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
@@ -13,6 +13,8 @@ const AddTask = ({ navigation }) => {
   const [status, setStatus] = useState('');
   const [description, setDescription] = useState('');
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertMessage, setAlertMessage] = useState('');
 
   const showDatePicker = () => {
     setDatePickerVisibility(true);
@@ -28,16 +30,32 @@ const AddTask = ({ navigation }) => {
   };
 
   const addTask = async () => {
-    console.log('Inside addTask');
-  
     // Check for mandatory fields
-    if (!newTask.trim() || !priority || !status || !dueDate) {
-      Alert.alert('Mandatory Fields', 'Please fill in the task title, select a priority, select Due Date and select a status.');
+    const missingFields = [];
+
+    if (!newTask.trim()) {
+      missingFields.push('Task Title');
+    }
+
+    if (!priority) {
+      missingFields.push('Priority');
+    }
+
+    if (!status) {
+      missingFields.push('Status');
+    }
+
+    if (!dueDate) {
+      missingFields.push('Due Date');
+    }
+
+    if (missingFields.length > 0) {
+      const missingFieldsMessage = missingFields.join(', ');
+      setShowAlert(true);
+      setAlertMessage(`Please fill in the following fields: ${missingFieldsMessage}`);
       return;
     }
-  
 
-  
     try {
       const existingTasks = await AsyncStorage.getItem('tasks');
       const tasks = existingTasks ? JSON.parse(existingTasks) : [];
@@ -49,13 +67,13 @@ const AddTask = ({ navigation }) => {
         description,
         dateTime: moment().format('YYYY-MM-DD HH:mm:ss'),
       };
-  
+
       const newTaskObject = {
         id: Date.now().toString(),
         title: newTask,
         details: newTaskDetails,
       };
-  
+
       const updatedTasks = [...tasks, newTaskObject];
       await AsyncStorage.setItem('tasks', JSON.stringify(updatedTasks));
       navigation.navigate('ViewTask', { taskTitle: newTask });
@@ -69,9 +87,7 @@ const AddTask = ({ navigation }) => {
       console.error('Error adding task:', error);
     }
   };
-  
-  
-  
+
   return (
     <ImageBackground
       source={require('/Users/apple/Desktop/Todo_Keka/BackGround.png')}
@@ -133,10 +149,32 @@ const AddTask = ({ navigation }) => {
         onCancel={hideDatePicker}
       />
 
-      <TouchableOpacity onPress={addTask} style={styles.addButton} >
+      <TouchableOpacity onPress={addTask} style={styles.addButton}>
         <Text style={styles.actionText}>Add Task</Text>
       </TouchableOpacity>
+
+      <AlertMessage
+        visible={showAlert}
+        message={alertMessage}
+        onClose={() => {
+          setShowAlert(false);
+          setAlertMessage('');
+        }}
+      />
     </ImageBackground>
+  );
+};
+
+const AlertMessage = ({ visible, message, onClose }) => {
+  if (!visible) return null;
+
+  return (
+    <View style={styles.alertContainer}>
+      <Text style={styles.alertText}>{message}</Text>
+      <TouchableOpacity onPress={onClose} style={styles.alertButton}>
+        <Text style={styles.actionText}>OK</Text>
+      </TouchableOpacity>
+    </View>
   );
 };
 
@@ -170,6 +208,26 @@ const styles = StyleSheet.create({
   actionText: {
     color: 'white',
     fontSize: 16,
+  },
+  alertContainer: {
+    backgroundColor: 'rgba(255, 0, 0, 0.8)',
+    padding: 10,
+    borderRadius: 5,
+    marginBottom: 10,
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  alertText: {
+    color: 'white',
+    fontSize: 16,
+  },
+  alertButton: {
+    backgroundColor: 'blue',
+    padding: 5,
+    borderRadius: 5,
+    alignItems: 'center',
   },
 });
 
