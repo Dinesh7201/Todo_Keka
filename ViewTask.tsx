@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Alert, ImageBackground } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import { Picker } from '@react-native-picker/picker';
@@ -53,13 +53,13 @@ const ViewTask = ({ route }) => {
               // Get existing tasks from storage
               const existingTasks = await AsyncStorage.getItem('tasks');
               const tasks = existingTasks ? JSON.parse(existingTasks) : [];
-  
+
               // Remove the task with the specified ID
               const updatedTasks = tasks.filter((task) => task.id !== taskId);
-  
+
               // Save updated tasks to storage
               await AsyncStorage.setItem('tasks', JSON.stringify(updatedTasks));
-  
+
               // Update the state to re-render the component
               setTasks(updatedTasks);
             } catch (error) {
@@ -72,7 +72,7 @@ const ViewTask = ({ route }) => {
       { cancelable: false }
     );
   };
-  
+
   const filterTasks = () => {
     let filteredTasks = tasks;
 
@@ -88,7 +88,10 @@ const ViewTask = ({ route }) => {
   };
 
   return (
-    <View style={styles.container}>
+    <ImageBackground
+      source={require('/Users/apple/Desktop/Todo_Keka/BackGround.jpeg')} // Replace './path/to/your/image.jpg' with the actual path to your JPEG image
+      style={styles.container}
+    >
       <Text style={styles.title}>Tasks</Text>
 
       {/* Priority Picker */}
@@ -171,7 +174,7 @@ const ViewTask = ({ route }) => {
       <TouchableOpacity onPress={navigateToAddTask} style={styles.addTaskButton}>
         <Text style={styles.actionText}>Add Task</Text>
       </TouchableOpacity>
-    </View>
+    </ImageBackground>
   );
 };
 
@@ -179,21 +182,26 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
+    resizeMode: 'cover',
   },
   title: {
     fontSize: 20,
     fontWeight: 'bold',
     marginBottom: 10,
+    color: 'white', // Set text color to white
   },
   pickerContainer: {
     marginBottom: 10,
+    backgroundColor: 'rgba(255, 255, 255, 0.5)', // Semi-transparent white background
+    borderRadius: 5,
+    padding: 5,
   },
   scrollView: {
     flex: 1,
     marginBottom: 20,
   },
   taskBox: {
-    backgroundColor: '#f0f0f0',
+    backgroundColor: 'rgba(255, 255, 255, 0.8)', // Semi-transparent white background
     padding: 15,
     marginBottom: 10,
     borderRadius: 5,
@@ -210,7 +218,7 @@ const styles = StyleSheet.create({
   },
   text: {
     marginTop: 5,
-    color: 'black', // Set text color to black
+    color: 'black',
   },
   editButton: {
     backgroundColor: 'green',
@@ -248,6 +256,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     marginTop: 10,
     textAlign: 'right',
+    color: 'black',
   },
 });
 

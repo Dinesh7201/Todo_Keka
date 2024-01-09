@@ -15,7 +15,7 @@ const App = () => {
       <Stack.Navigator initialRouteName="ViewTask">
         
         <Stack.Screen name="ViewTask" component={ViewTask} options={{ title: 'View Task', headerShown: false }}/>
-        <Stack.Screen name="AddTask" component={AddTask} options={{ title: 'Add Task' }} />
+        <Stack.Screen name="AddTask" component={AddTask} options={{ title: 'Add Task' , headerShown: false}} />
         <Stack.Screen name="EditTask" component={EditTask} />
       </Stack.Navigator>
     </NavigationContainer>

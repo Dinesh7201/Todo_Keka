@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, TextInput, TouchableOpacity, Text, StyleSheet, Alert } from 'react-native';
+import { View, TextInput, TouchableOpacity, Text, StyleSheet, Alert, ImageBackground } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation, useRoute } from '@react-navigation/native';
@@ -69,7 +69,12 @@ const EditTask = () => {
   
 
   return (
-    <View style={styles.container}>
+    
+
+      <ImageBackground
+      source={require('/Users/apple/Desktop/Todo_Keka/BackGround.jpeg')} // Replace 'your-image-path' with the actual path to your image
+      style={styles.container}
+    >
       <Text style={styles.title}>Edit Task</Text>
       <TextInput
         style={styles.input}
@@ -110,7 +115,8 @@ const EditTask = () => {
       <TouchableOpacity onPress={updateTask} style={styles.updateButton}>
         <Text style={styles.actionText}>Update Task</Text>
       </TouchableOpacity>
-    </View>
+      </ImageBackground>
+  
   );
 };
 

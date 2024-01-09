@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ImageBackground } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Picker } from '@react-native-picker/picker';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
@@ -38,7 +38,7 @@ const AddTask = ({ navigation }) => {
       const existingTasks = await AsyncStorage.getItem('tasks');
       const tasks = existingTasks ? JSON.parse(existingTasks) : [];
 
-      // Add the new task with current date and time
+      // Add the new task with the current date and time
       const newTaskDetails = {
         dueDate,
         priority,
@@ -59,10 +59,10 @@ const AddTask = ({ navigation }) => {
       // Save updated tasks to storage
       await AsyncStorage.setItem('tasks', JSON.stringify(updatedTasks));
 
-      // Navigate to ViewTask screen with the new task title
+      // Navigate to the ViewTask screen with the new task title
       navigation.navigate('ViewTask', { taskTitle: newTask });
-      
-      // Clear input fields after adding task
+
+      // Clear input fields after adding the task
       setNewTask('');
       setDueDate('');
       setPriority('Low');
@@ -75,7 +75,10 @@ const AddTask = ({ navigation }) => {
   };
 
   return (
-    <View style={styles.container}>
+    <ImageBackground
+      source={require('/Users/apple/Desktop/Todo_Keka/BackGround.jpeg')} // Replace 'your-image-path' with the actual path to your image
+      style={styles.container}
+    >
       <Text style={styles.title}>Add Task</Text>
       <TextInput
         style={styles.input}
@@ -125,7 +128,7 @@ const AddTask = ({ navigation }) => {
       <TouchableOpacity onPress={addTask} style={styles.addButton}>
         <Text style={styles.actionText}>Add Task</Text>
       </TouchableOpacity>
-    </View>
+    </ImageBackground>
   );
 };
 
@@ -133,18 +136,22 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    resizeMode: 'cover', // or 'stretch' for different cover behaviors
   },
   title: {
     fontSize: 20,
     fontWeight: 'bold',
     marginBottom: 20,
+    color: 'white', // Set text color to white
   },
   input: {
-    height: 40,
-    borderColor: 'gray',
-    borderWidth: 1,
-    marginBottom: 20,
+    backgroundColor: 'rgba(255, 255, 255, 0.8)', // Use rgba to set a transparent background color
+    borderRadius: 5,
     padding: 10,
+    marginBottom: 10,
+    width: '100%',
   },
   addButton: {
     backgroundColor: 'blue',
