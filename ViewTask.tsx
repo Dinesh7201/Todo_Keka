@@ -3,6 +3,7 @@ import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Alert } from 'rea
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import { Picker } from '@react-native-picker/picker';
+import moment from 'moment';
 
 const ViewTask = ({ route }) => {
   const navigation = useNavigation();
@@ -16,7 +17,9 @@ const ViewTask = ({ route }) => {
       try {
         const storedTasks = await AsyncStorage.getItem('tasks');
         if (storedTasks) {
-          setTasks(JSON.parse(storedTasks));
+          const parsedTasks = JSON.parse(storedTasks);
+          const sortedTasks = parsedTasks.sort((a, b) => moment(b.dateAdded) - moment(a.dateAdded));
+          setTasks(sortedTasks);
         }
       } catch (error) {
         console.error('Error loading tasks:', error);
@@ -76,6 +79,7 @@ const ViewTask = ({ route }) => {
     <View style={styles.container}>
       <Text style={styles.title}>Tasks</Text>
 
+      {/* Priority Picker */}
       <View style={styles.pickerContainer}>
         <Picker
           selectedValue={selectedPriority}
@@ -88,6 +92,7 @@ const ViewTask = ({ route }) => {
         </Picker>
       </View>
 
+      {/* Status Picker */}
       <View style={styles.pickerContainer}>
         <Picker
           selectedValue={selectedStatus}
@@ -101,31 +106,57 @@ const ViewTask = ({ route }) => {
       </View>
 
       <ScrollView style={styles.scrollView}>
-        {filterTasks().map((task, index) => (
-          <View key={index} style={styles.taskBox}>
-            <Text>Due Date: {task.details?.dueDate || 'N/A'}</Text>
-            <Text>Priority: {task.details?.priority || 'N/A'}</Text>
-            <Text>Category: {task.details?.category || 'N/A'}</Text>
-            <Text>Status: {task.details?.status || 'N/A'}</Text>
-            <Text>Title: {task.title}</Text>
-            <Text>Description: {task.details?.description || 'N/A'}</Text>
+        {filterTasks().map((task) => (
+          <View key={task.id} style={styles.taskBox}>
+            <View style={styles.row}>
+  <Text style={styles.label}>Due Date:</Text>
+  <Text>{task.details?.dueDate || 'N/A'}</Text>
+</View>
 
-            {/* Display the date and time of adding task */}
+<View style={styles.row}>
+  <Text style={styles.label}>Priority:</Text>
+  <Text style={styles.text}>{task.details?.priority || 'N/A'}</Text>
+</View>
+
+<View style={styles.row}>
+  <Text style={styles.label}>Category:</Text>
+  <Text style={styles.text}>{task.details?.category || 'N/A'}</Text>
+</View>
+
+<View style={styles.row}>
+  <Text style={styles.label}>Status:</Text>
+  <Text style={styles.text}>{task.details?.status || 'N/A'}</Text>
+</View>
+
+<View style={styles.row}>
+  <Text style={styles.label}>Title:</Text>
+  <Text style={styles.text}>{task.title}</Text>
+</View>
+
+<View style={styles.row}>
+  <Text style={styles.label}>Description:</Text>
+  <Text style={styles.text}>{task.details?.description || 'N/A'}</Text>
+</View>
+
+
+            <View style={styles.editDeleteContainer}>
+              <TouchableOpacity onPress={() => handleEditTask(task.id)} style={styles.editButton}>
+                <Text style={styles.actionText}>Edit</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => handleDeleteTask(task.id)} style={styles.deleteButton}>
+                <Text style={styles.actionText}>Delete</Text>
+              </TouchableOpacity>
+            </View>
+
+            {/* Display date added at the bottom right corner */}
             <Text style={styles.dateTime}>
-              Added on: {new Date(task.addedOn).toLocaleString()}
+              Added on: {task.details?.dateTime || 'N/A'}
             </Text>
-
-            {/* Edit and Delete options for each task */}
-            <TouchableOpacity onPress={() => handleEditTask(task.id)} style={styles.editButton}>
-              <Text style={styles.actionText}>Edit</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => handleDeleteTask(task.id)} style={styles.deleteButton}>
-              <Text style={styles.actionText}>Delete</Text>
-            </TouchableOpacity>
           </View>
         ))}
       </ScrollView>
 
+      {/* Add Task button at top right corner */}
       <TouchableOpacity onPress={navigateToAddTask} style={styles.addTaskButton}>
         <Text style={styles.actionText}>Add Task</Text>
       </TouchableOpacity>
@@ -155,12 +186,22 @@ const styles = StyleSheet.create({
     padding: 15,
     marginBottom: 10,
     borderRadius: 5,
+    borderColor: '#333',
+    borderWidth: 1,
   },
-  dateTime: {
-    fontSize: 12,
-    color: 'gray',
-    marginTop: 5,
+  row: {
+    flexDirection: 'row',
+    alignItems: 'baseline', // Align items at the baseline for vertical alignment
   },
+  label: {
+    fontWeight: 'bold',
+    marginRight: 5,
+  },
+  text: {
+    marginTop: 5, // Adjust the marginTop as needed
+  },
+  
+  
   editButton: {
     backgroundColor: 'green',
     padding: 10,
@@ -180,10 +221,23 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 5,
     alignItems: 'center',
+    position: 'absolute',
+    top: 20,
+    right: 20,
+  },
+  editDeleteContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 10,
   },
   actionText: {
     color: 'white',
     fontSize: 16,
+  },
+  dateTime: {
+    fontSize: 12,
+    marginTop: 10,
+    textAlign: 'right',
   },
 });
 

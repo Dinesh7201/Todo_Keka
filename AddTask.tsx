@@ -1,14 +1,10 @@
-// AddTask.tsx
 import React, { useState } from 'react';
-import { View, TextInput, TouchableOpacity, Text, StyleSheet, Alert,  } from 'react-native';
+import { View, TextInput, TouchableOpacity, Text, StyleSheet, Alert } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import moment from 'moment';
 
 const AddTask = ({ navigation }) => {
-  const handleGoBack = () => {
-    // Use navigation.goBack() when you want to go back
-    navigation.goBack();
-  };
   const [newTask, setNewTask] = useState('');
   const [dueDate, setDueDate] = useState('');
   const [priority, setPriority] = useState('Low');
@@ -21,33 +17,33 @@ const AddTask = ({ navigation }) => {
       Alert.alert('Mandatory Field', 'Please fill in the task title.');
       return;
     }
-  
+
     try {
       // Get existing tasks from storage
-      const currentDate = new Date();
       const existingTasks = await AsyncStorage.getItem('tasks');
       const tasks = existingTasks ? JSON.parse(existingTasks) : [];
-  
-      // Add the new task
+
+      // Add the new task with current date and time
+      const newTaskDetails = {
+        dueDate,
+        priority,
+        category,
+        status,
+        description,
+        dateTime: moment().format('YYYY-MM-DD HH:mm:ss'),
+      };
+
       const updatedTasks = [
         ...tasks,
         {
           title: newTask,
-          details: {
-            dueDate,
-            priority,
-            category,
-            status,
-            description,
-          },
-          id: Date.now(), // Add a unique ID to the task
-          addedOn: currentDate.toISOString(),
+          details: newTaskDetails,
         },
       ];
-  
+
       // Save updated tasks to storage
       await AsyncStorage.setItem('tasks', JSON.stringify(updatedTasks));
-  
+
       // Navigate to ViewTask screen with the new task title
       navigation.navigate('ViewTask', { taskTitle: newTask });
       setNewTask('');
@@ -60,7 +56,6 @@ const AddTask = ({ navigation }) => {
       console.error('Error adding task:', error);
     }
   };
-  
 
   return (
     <View style={styles.container}>
