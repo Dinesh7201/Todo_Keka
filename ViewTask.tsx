@@ -1,5 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Alert, ImageBackground , Image} from 'react-native';
+import {
+  View,
+  Text,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+  Alert,
+  ImageBackground,
+  Image,
+  TextInput,
+} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import { Picker } from '@react-native-picker/picker';
@@ -12,6 +22,7 @@ const ViewTask = ({ route }) => {
   const [selectedPriority, setSelectedPriority] = useState('All');
   const [selectedStatus, setSelectedStatus] = useState('All');
   const [sortOrder, setSortOrder] = useState('latest');
+  const [categoryQuery, setCategoryQuery] = useState('');
 
   useEffect(() => {
     const loadTasks = async () => {
@@ -28,7 +39,7 @@ const ViewTask = ({ route }) => {
     };
 
     loadTasks();
-  }, [route.params?.taskTitle, tasks.length]);
+  }, [route.params?.taskTitle]);
 
   const navigateToAddTask = () => {
     navigation.navigate('AddTask');
@@ -82,12 +93,19 @@ const ViewTask = ({ route }) => {
       filteredTasks = filteredTasks.filter((task) => task.details?.status === selectedStatus);
     }
 
-    if (sortOrder === 'latest') {
-      filteredTasks = filteredTasks.sort((a, b) => moment(b.dateAdded) - moment(a.dateAdded));
-    } else if (sortOrder === 'dueDateTop') {
+    if (categoryQuery.trim() !== '') {
+      filteredTasks = filteredTasks.filter(
+        (task) => task.details?.category && task.details?.category.includes(categoryQuery)
+      );
+    }
+
+    if (sortOrder === 'dueDateTop') {
       filteredTasks = filteredTasks.sort((a, b) => moment(a.details?.dueDate) - moment(b.details?.dueDate));
     } else if (sortOrder === 'dueDateBottom') {
       filteredTasks = filteredTasks.sort((a, b) => moment(b.details?.dueDate) - moment(a.details?.dueDate));
+    } else {
+      // Default sorting by Task Added in descending order (latest first)
+      filteredTasks = filteredTasks.sort((a, b) => moment(b.dateAdded) - moment(a.dateAdded));
     }
 
     return filteredTasks;
@@ -95,73 +113,74 @@ const ViewTask = ({ route }) => {
 
   return (
     <ImageBackground
-      source={require('/Users/apple/Desktop/Todo_Keka/BackGround.png')} // Replace './path/to/your/image.jpg' with the actual path to your JPEG image
+      source={require('/Users/apple/Desktop/Todo_Keka/BackGround.png')}
       style={styles.container}
     >
-      <Image
-        source={require('/Users/apple/Desktop/Todo_Keka/logo.png')} // Replace with the actual path to your logo
-        style={styles.logo}
-      />
+      
+      <Image source={require('/Users/apple/Desktop/Todo_Keka/logo.png')} style={styles.logo} />
       <Text style={styles.title}>Tasks</Text>
-<Text></Text>
+      <Text></Text>
+
       {/* Priority Picker */}
       <View style={styles.pickerContainer}>
-  <Picker
-    selectedValue={selectedPriority}
-    onValueChange={(itemValue) => setSelectedPriority(itemValue)}
-    style={styles.whitePicker}
-  >
-    <Picker.Item label="Select Priority" value="All" />
-    <Picker.Item label="High" value="High" />
-    <Picker.Item label="Medium" value="Medium" />
-    <Picker.Item label="Low" value="Low" />
-  </Picker>
-</View>
+        {/* Category Search */}
+      <TextInput
+        style={styles.input}
+        placeholder="Search by Category"
+        value={categoryQuery}
+        onChangeText={(text) => setCategoryQuery(text)}
+      />
+        <Picker
+          selectedValue={selectedPriority}
+          onValueChange={(itemValue) => setSelectedPriority(itemValue)}
+          style={styles.whitePicker}
+        >
+          <Picker.Item label="Select Priority" value="All" />
+          <Picker.Item label="High" value="High" />
+          <Picker.Item label="Medium" value="Medium" />
+          <Picker.Item label="Low" value="Low" />
+        </Picker>
+      </View>
 
-{/* Status Picker */}
-<View style={styles.pickerContainer}>
-  <Picker
-    selectedValue={selectedStatus}
-    onValueChange={(itemValue) => setSelectedStatus(itemValue)}
-    style={styles.whitePicker}
-  >
-    <Picker.Item label="Select Status" value="All" />
-    <Picker.Item label="New" value="New" />
-    <Picker.Item label="In Progress" value="In Progress" />
-    <Picker.Item label="Completed" value="Completed" />
-  </Picker>
-</View>
+      {/* Status Picker */}
+      <View style={styles.pickerContainer}>
+        <Picker
+          selectedValue={selectedStatus}
+          onValueChange={(itemValue) => setSelectedStatus(itemValue)}
+          style={styles.whitePicker}
+        >
+          <Picker.Item label="Select Status" value="All" />
+          <Picker.Item label="New" value="New" />
+          <Picker.Item label="In Progress" value="In Progress" />
+          <Picker.Item label="Completed" value="Completed" />
+        </Picker>
+      </View>
+
+     
 
       {/* Sorting options */}
       <View style={styles.sortOptionsContainer}>
-  <Text style={styles.sortLabel}>Sort by Due Date:</Text>
-  <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-    <TouchableOpacity
-      onPress={() => handleSortOrderChange('latest')}
-      style={[styles.sortButton, sortOrder === 'latest' && styles.activeSortButton]}
-    >
-      <Text style={styles.sortButtonText}>Latest Entry</Text>
-    </TouchableOpacity>
-    <TouchableOpacity
-      onPress={() => handleSortOrderChange('dueDateTop')}
-      style={[styles.sortButton, sortOrder === 'dueDateTop' && styles.activeSortButton]}
-    >
-      <Text style={styles.sortButtonText}>Due Date (Top)</Text>
-    </TouchableOpacity>
-    <TouchableOpacity
-      onPress={() => handleSortOrderChange('dueDateBottom')}
-      style={[styles.sortButton, sortOrder === 'dueDateBottom' && styles.activeSortButton]}
-    >
-      <Text style={styles.sortButtonText}>Due Date (Bottom)</Text>
-    </TouchableOpacity>
-  </ScrollView>
-</View>
+        <Text style={styles.sortL}>Sort by Due Date:</Text>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+          <TouchableOpacity
+            onPress={() => handleSortOrderChange('dueDateTop')}
+            style={[styles.sortButton, sortOrder === 'dueDateTop' && styles.activeSortButton]}
+          >
+            <Text style={styles.sortButtonText}>Ascending</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => handleSortOrderChange('dueDateBottom')}
+            style={[styles.sortButton, sortOrder === 'dueDateBottom' && styles.activeSortButton]}
+          >
+            <Text style={styles.sortButtonText}>Decending</Text>
+          </TouchableOpacity>
+        </ScrollView>
+      </View>
 
       <ScrollView style={styles.scrollView}>
         {filterAndSortTasks().map((task) => (
           <View key={task.id} style={styles.taskBox}>
             <View style={styles.row}>
-            
               <Text style={styles.textTitle}>{task.title}</Text>
             </View>
             <View style={styles.row}>
@@ -183,8 +202,6 @@ const ViewTask = ({ route }) => {
               <Text style={styles.label}>Status:</Text>
               <Text style={styles.text}>{task.details?.status || 'N/A'}</Text>
             </View>
-
-            
 
             <View style={styles.row}>
               <Text style={styles.label}>Description:</Text>
@@ -213,6 +230,11 @@ const ViewTask = ({ route }) => {
     </ImageBackground>
   );
 };
+
+
+
+export default ViewTask;
+
 
 const styles = StyleSheet.create({
   container: {
@@ -284,6 +306,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginVertical: 5,
   },
+  input: {
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    borderRadius: 5,
+    padding: 10,
+    marginBottom: 10,
+    width: '100%',
+  },
   addTaskButton: {
     backgroundColor: 'blue',
     padding: 10,
@@ -314,6 +343,12 @@ const styles = StyleSheet.create({
     
   },
   sortLabel: {
+    color: 'white',
+    fontWeight: 'bold',
+    
+  },
+  sortL: {
+    marginTop : 5,
     color: 'white',
     fontWeight: 'bold',
     
