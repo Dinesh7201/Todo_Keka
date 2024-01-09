@@ -4,6 +4,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Picker } from '@react-native-picker/picker';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import moment from 'moment';
+import Modal from 'react-native-modal';
 
 const AddTask = ({ navigation }) => {
   const [newTask, setNewTask] = useState('');
@@ -51,8 +52,8 @@ const AddTask = ({ navigation }) => {
 
     if (missingFields.length > 0) {
       const missingFieldsMessage = missingFields.join(', ');
-      setShowAlert(true);
       setAlertMessage(`Please fill in the following fields: ${missingFieldsMessage}`);
+      setShowAlert(true);
       return;
     }
 
@@ -153,28 +154,15 @@ const AddTask = ({ navigation }) => {
         <Text style={styles.actionText}>Add Task</Text>
       </TouchableOpacity>
 
-      <AlertMessage
-        visible={showAlert}
-        message={alertMessage}
-        onClose={() => {
-          setShowAlert(false);
-          setAlertMessage('');
-        }}
-      />
+      <Modal isVisible={showAlert} backdropOpacity={0.5}>
+        <View style={styles.modalContainer}>
+          <Text style={styles.modalText}>{alertMessage}</Text>
+          <TouchableOpacity onPress={() => setShowAlert(false)} style={styles.modalButton}>
+            <Text style={styles.actionText}>OK</Text>
+          </TouchableOpacity>
+        </View>
+      </Modal>
     </ImageBackground>
-  );
-};
-
-const AlertMessage = ({ visible, message, onClose }) => {
-  if (!visible) return null;
-
-  return (
-    <View style={styles.alertContainer}>
-      <Text style={styles.alertText}>{message}</Text>
-      <TouchableOpacity onPress={onClose} style={styles.alertButton}>
-        <Text style={styles.actionText}>OK</Text>
-      </TouchableOpacity>
-    </View>
   );
 };
 
@@ -209,23 +197,19 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 16,
   },
-  alertContainer: {
-    backgroundColor: 'rgba(255, 0, 0, 0.8)',
-    padding: 10,
+  modalContainer: {
+    backgroundColor: 'white',
+    padding: 20,
     borderRadius: 5,
-    marginBottom: 10,
-    width: '100%',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
   },
-  alertText: {
-    color: 'white',
+  modalText: {
     fontSize: 16,
+    marginBottom: 10,
   },
-  alertButton: {
+  modalButton: {
     backgroundColor: 'blue',
-    padding: 5,
+    padding: 10,
     borderRadius: 5,
     alignItems: 'center',
   },
