@@ -35,23 +35,23 @@ const AddTask = ({ navigation }) => {
     const missingFields = [];
 
     if (!newTask.trim()) {
-      missingFields.push('Task Title');
+      missingFields.push('\n*Task Title');
     }
 
     if (!priority) {
-      missingFields.push('Priority');
+      missingFields.push('\n*Priority');
     }
 
     if (!status) {
-      missingFields.push('Status');
+      missingFields.push('\n*Status');
     }
 
     if (!dueDate) {
-      missingFields.push('Due Date');
+      missingFields.push('\n*Due Date');
     }
 
     if (missingFields.length > 0) {
-      const missingFieldsMessage = missingFields.join(', ');
+      const missingFieldsMessage = missingFields.join(' ');
       setAlertMessage(`Please fill in the following fields: ${missingFieldsMessage}`);
       setShowAlert(true);
       return;
@@ -98,7 +98,7 @@ const AddTask = ({ navigation }) => {
 
       <TextInput
         style={styles.input}
-        placeholder="Enter task title"
+        placeholder="*Enter task title"
         value={newTask}
         onChangeText={(text) => setNewTask(text)}
       />
@@ -126,7 +126,7 @@ const AddTask = ({ navigation }) => {
         selectedValue={priority}
         onValueChange={(itemValue) => setPriority(itemValue)}
       >
-        <Picker.Item label="Select Priority" value="" />
+        <Picker.Item label="*Select Priority" value="" />
         <Picker.Item label="High Priority" value="High" />
         <Picker.Item label="Medium Priority" value="Medium" />
         <Picker.Item label="Low Priority" value="Low" />
@@ -137,7 +137,7 @@ const AddTask = ({ navigation }) => {
         selectedValue={status}
         onValueChange={(itemValue) => setStatus(itemValue)}
       >
-        <Picker.Item label="Select Status" value="" />
+        <Picker.Item label="*Select Status" value="" />
         <Picker.Item label="New" value="New" />
         <Picker.Item label="In Progress" value="In Progress" />
         <Picker.Item label="Completed" value="Completed" />
