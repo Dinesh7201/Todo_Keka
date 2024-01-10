@@ -1,5 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Alert, ImageBackground  } from 'react-native';
+import {
+  View,
+  Text,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+  Alert,
+  ImageBackground,
+  Image,
+  TextInput,
+} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import { Picker } from '@react-native-picker/picker';
@@ -11,6 +21,8 @@ const ViewTask = ({ route }) => {
   const { taskTitle } = route.params || {};
   const [selectedPriority, setSelectedPriority] = useState('All');
   const [selectedStatus, setSelectedStatus] = useState('All');
+  const [sortOrder, setSortOrder] = useState('latest');
+  const [categoryQuery, setCategoryQuery] = useState('');
 
   useEffect(() => {
     const loadTasks = async () => {
@@ -27,15 +39,13 @@ const ViewTask = ({ route }) => {
     };
 
     loadTasks();
-  }, [route.params?.taskTitle, tasks.length]);
+  }, [route.params?.taskTitle]);
 
   const navigateToAddTask = () => {
     navigation.navigate('AddTask');
   };
 
-  const handleEditTask = (taskId) => {
-    navigation.navigate('EditTask', { taskId });
-  };
+  
 
   const handleDeleteTask = async (taskId) => {
     Alert.alert(
@@ -50,17 +60,10 @@ const ViewTask = ({ route }) => {
           text: 'Delete',
           onPress: async () => {
             try {
-              // Get existing tasks from storage
               const existingTasks = await AsyncStorage.getItem('tasks');
               const tasks = existingTasks ? JSON.parse(existingTasks) : [];
-  
-              // Remove the task with the specified ID
               const updatedTasks = tasks.filter((task) => task.id !== taskId);
-  
-              // Save updated tasks to storage
               await AsyncStorage.setItem('tasks', JSON.stringify(updatedTasks));
-  
-              // Update the state to re-render the component
               setTasks(updatedTasks);
             } catch (error) {
               console.error('Error deleting task:', error);
@@ -72,8 +75,12 @@ const ViewTask = ({ route }) => {
       { cancelable: false }
     );
   };
-  
-  const filterTasks = () => {
+
+  const handleSortOrderChange = (order) => {
+    setSortOrder(order);
+  };
+
+  const filterAndSortTasks = () => {
     let filteredTasks = tasks;
 
     if (selectedPriority !== 'All') {
@@ -84,24 +91,49 @@ const ViewTask = ({ route }) => {
       filteredTasks = filteredTasks.filter((task) => task.details?.status === selectedStatus);
     }
 
+    if (categoryQuery.trim() !== '') {
+      filteredTasks = filteredTasks.filter(
+        (task) => task.details?.category && task.details?.category.includes(categoryQuery)
+      );
+    }
+
+    if (sortOrder === 'dueDateTop') {
+      filteredTasks = filteredTasks.sort((a, b) => moment(a.details?.dueDate) - moment(b.details?.dueDate));
+    } else if (sortOrder === 'dueDateBottom') {
+      filteredTasks = filteredTasks.sort((a, b) => moment(b.details?.dueDate) - moment(a.details?.dueDate));
+    } else {
+      // Default sorting by Task Added in descending order (latest first)
+      filteredTasks = filteredTasks.sort((a, b) => moment(b.dateAdded) - moment(a.dateAdded));
+    }
+
     return filteredTasks;
   };
 
   return (
     <ImageBackground
-      source={require('/Users/apple/Desktop/Todo_Keka/BackGround.jpeg')} // Replace './path/to/your/image.jpg' with the actual path to your JPEG image
+      source={require('/Users/apple/Desktop/Todo_Keka/assets/BackGround.png')}
       style={styles.container}
     >
+      
+      <Image source={require('/Users/apple/Desktop/Todo_Keka/assets/logo.png')} style={styles.logo} />
       <Text style={styles.title}>Tasks</Text>
+      <Text></Text>
 
       {/* Priority Picker */}
       <View style={styles.pickerContainer}>
+        {/* Category Search */}
+      <TextInput
+        style={styles.input}
+        placeholder="Search by Category"
+        value={categoryQuery}
+        onChangeText={(text) => setCategoryQuery(text)}
+      />
         <Picker
           selectedValue={selectedPriority}
           onValueChange={(itemValue) => setSelectedPriority(itemValue)}
           style={styles.whitePicker}
         >
-          <Picker.Item label="All" value="All" />
+          <Picker.Item label="Select Priority" value="All" />
           <Picker.Item label="High" value="High" />
           <Picker.Item label="Medium" value="Medium" />
           <Picker.Item label="Low" value="Low" />
@@ -115,21 +147,40 @@ const ViewTask = ({ route }) => {
           onValueChange={(itemValue) => setSelectedStatus(itemValue)}
           style={styles.whitePicker}
         >
-          <Picker.Item label="All" value="All" />
+          <Picker.Item label="Select Status" value="All" />
           <Picker.Item label="New" value="New" />
           <Picker.Item label="In Progress" value="In Progress" />
           <Picker.Item label="Completed" value="Completed" />
         </Picker>
       </View>
 
-      <ScrollView style={styles.scrollView}>
-        {filterTasks().map((task) => (
-          <View key={task.id} style={styles.taskBox}>
-            {/* Title Box */}
-            <View style={styles.titleBox}>
-              <Text style={styles.titleText}>{task.title}</Text>
-            </View>
+     
 
+      {/* Sorting options */}
+      <View style={styles.sortOptionsContainer}>
+        <Text style={styles.sortL}>Sort by Due Date:</Text>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+          <TouchableOpacity
+            onPress={() => handleSortOrderChange('dueDateTop')}
+            style={[styles.sortButton, sortOrder === 'dueDateTop' && styles.activeSortButton]}
+          >
+            <Text style={styles.sortButtonText}>Ascending</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => handleSortOrderChange('dueDateBottom')}
+            style={[styles.sortButton, sortOrder === 'dueDateBottom' && styles.activeSortButton]}
+          >
+            <Text style={styles.sortButtonText}>Decending</Text>
+          </TouchableOpacity>
+        </ScrollView>
+      </View>
+
+      <ScrollView style={styles.scrollView}>
+        {filterAndSortTasks().map((task) => (
+          <View key={task.id} style={styles.taskBox}>
+            <View style={styles.row}>
+              <Text style={styles.textTitle}>{task.title}</Text>
+            </View>
             <View style={styles.row}>
               <Text style={styles.label}>Due Date:</Text>
               <Text style={styles.text}>{task.details?.dueDate || 'N/A'}</Text>
@@ -151,25 +202,17 @@ const ViewTask = ({ route }) => {
             </View>
 
             <View style={styles.row}>
-              <Text style={styles.label}>Title:</Text>
-              <Text style={styles.text}>{task.title}</Text>
-            </View>
-
-            <View style={styles.row}>
               <Text style={styles.label}>Description:</Text>
               <Text style={styles.text}>{task.details?.description || 'N/A'}</Text>
             </View>
 
             <View style={styles.editDeleteContainer}>
-              <TouchableOpacity onPress={() => handleEditTask(task.id)} style={styles.editButton}>
-                <Text style={styles.actionText}>Edit</Text>
-              </TouchableOpacity>
+              
               <TouchableOpacity onPress={() => handleDeleteTask(task.id)} style={styles.deleteButton}>
                 <Text style={styles.actionText}>Delete</Text>
               </TouchableOpacity>
             </View>
 
-            {/* Display date added at the bottom right corner */}
             <Text style={styles.dateTime}>
               Added on: {task.details?.dateTime || 'N/A'}
             </Text>
@@ -177,31 +220,45 @@ const ViewTask = ({ route }) => {
         ))}
       </ScrollView>
 
-      {/* Add Task button at the top right corner */}
       <TouchableOpacity onPress={navigateToAddTask} style={styles.addTaskButton}>
         <Text style={styles.actionText}>Add Task</Text>
       </TouchableOpacity>
-      </ImageBackground>
+    </ImageBackground>
   );
 };
+
+
+
+export default ViewTask;
+
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
   },
+  logo: {
+    width: 50, // Adjust the width as needed
+    height: 50, // Adjust the height as needed
+    position: 'absolute',
+    top: 20,
+    left: 20,
+  },
   title: {
     fontSize: 20,
     fontWeight: 'bold',
     marginBottom: 10,
-    color: 'white'
+    color: 'white',
+    textAlign: 'center',
   },
   pickerContainer: {
     marginBottom: 10,
+
   },
   whitePicker: {
     backgroundColor: 'white', // Set the background color to white
   },
+
   scrollView: {
     flex: 1,
     marginBottom: 20,
@@ -214,20 +271,6 @@ const styles = StyleSheet.create({
     borderColor: '#333',
     borderWidth: 1,
   },
-  titleBox: {
-    backgroundColor: 'blue', // Set the background color for the title box
-    padding: 10,
-    borderRadius: 5,
-    marginBottom: 0, // Remove the bottom margin
-    alignItems: 'center', // Center the text horizontally
-    borderBottomWidth: 1, // Add a border at the bottom of the title box
-    borderBottomColor: 'white', // Set the color of the border
-  },
-  titleText: {
-    color: 'white', // Set the text color for the title
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
   row: {
     flexDirection: 'row',
     alignItems: 'baseline',
@@ -238,7 +281,12 @@ const styles = StyleSheet.create({
   },
   text: {
     marginTop: 5,
-    color: 'black', // Set text color to black
+    color: 'black',
+  },
+  textTitle: {
+    marginTop: 5,
+    color: 'black',
+    fontSize: 23
   },
   editButton: {
     backgroundColor: 'green',
@@ -254,6 +302,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginVertical: 5,
   },
+  input: {
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    borderRadius: 5,
+    padding: 10,
+    marginBottom: 10,
+    width: '100%',
+  },
   addTaskButton: {
     backgroundColor: 'blue',
     padding: 10,
@@ -263,11 +318,13 @@ const styles = StyleSheet.create({
     top: 20,
     right: 20,
   },
-  editDeleteContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 10,
-  },
+  // Change this part of your code
+editDeleteContainer: {
+  flexDirection: 'row-reverse', // Change from 'row' to 'row-reverse'
+  justifyContent: 'space-between',
+  marginTop: 10,
+},
+
   actionText: {
     color: 'white',
     fontSize: 16,
@@ -276,6 +333,39 @@ const styles = StyleSheet.create({
     fontSize: 12,
     marginTop: 10,
     textAlign: 'right',
+  },
+  sortOptionsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 10,
+    
+  },
+  sortLabel: {
+    color: 'white',
+    fontWeight: 'bold',
+    
+  },
+  sortL: {
+    marginTop : 5,
+    color: 'white',
+    fontWeight: 'bold',
+    
+  },
+  sortButtonsContainer: {
+    flexDirection: 'row',
+    backgroundColor: 'white',
+  },
+  sortButton: {
+    backgroundColor: 'rgba(255, 255, 255, 0.5)',
+    padding: 5,
+    borderRadius: 5,
+    marginHorizontal: 5,
+  },
+  sortButtonText: {
+    color: 'white',
+  },
+  activeSortButton: {
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
   },
 });
 

@@ -91,7 +91,7 @@ const AddTask = ({ navigation }) => {
 
   return (
     <ImageBackground
-      source={require('/Users/apple/Desktop/Todo_Keka/BackGround.png')}
+      source={require('/Users/apple/Desktop/Todo_Keka/assets/BackGround.png')}
       style={styles.container}
     >
       <Text style={styles.title}>Add Task</Text>

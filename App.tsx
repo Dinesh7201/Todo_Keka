@@ -3,9 +3,9 @@ import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 
-import AddTask from './AddTask';
-import ViewTask from './ViewTask';
-import EditTask from './EditTask';
+import AddTask from './components/AddTask';
+import ViewTask from './components/ViewTask';
+
 
 const Stack = createStackNavigator();
 
@@ -16,7 +16,7 @@ const App = () => {
         
         <Stack.Screen name="ViewTask" component={ViewTask} options={{ title: 'View Task', headerShown: false }}/>
         <Stack.Screen name="AddTask" component={AddTask} options={{ title: 'Add Task' , headerShown: false}} />
-        <Stack.Screen name="EditTask" component={EditTask} />
+
       </Stack.Navigator>
     </NavigationContainer>
   );
