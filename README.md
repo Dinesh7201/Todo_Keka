@@ -155,13 +155,13 @@ To learn more about React Native, take a look at the following resources:
 
 
 ## Screenshots
-##[YOUTUBE(Demo link)](https://youtu.be/TTw3d6T23Q0?si=9R4xWgaRfqvEDx_N)
+## [YOUTUBE(Demo link)](https://youtu.be/TTw3d6T23Q0?si=9R4xWgaRfqvEDx_N)
 
 **Please check my above YOUTUBE link for better understanding of features in the project**
 
 **FOR VIDEO DEMO CLICK BELOW LINK**
 
-##[CLICK HERE](https://drive.google.com/file/d/1TYk0rJVF6cPuAV-zZOPOfh4y3qau5R9I/view?usp=sharing)
+## [CLICK HERE](https://drive.google.com/file/d/1TYk0rJVF6cPuAV-zZOPOfh4y3qau5R9I/view?usp=sharing)
 
 ### App Logo
 ![App Screenshot](https://github.com/Dinesh7201/Todo_Keka/blob/main/ScreenShots/Screenshot%202024-01-10%20at%201.58.48%20PM.png?raw=true)
