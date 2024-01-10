@@ -6,6 +6,29 @@ This is a new [**React Native**](https://reactnative.dev) project, bootstrapped 
 
 *******************************************[Click here](https://drive.google.com/file/d/1TYk0rJVF6cPuAV-zZOPOfh4y3qau5R9I/view?usp=sharing)****************
 
+## Screenshots
+### Screenshots
+
+![App Screenshot](https://github.com/Dinesh7201/Todo_Keka/blob/main/ScreenShots/Screenshot%202024-01-10%20at%201.58.48%20PM.png?raw=true)
+# App logo
+
+![App Screenshot](https://github.com/Dinesh7201/Todo_Keka/blob/main/ScreenShots/Screenshot%202024-01-10%20at%201.59.06%20PM.png?raw=true)
+# View Tasks
+
+![App Screenshot](https://github.com/Dinesh7201/Todo_Keka/blob/main/ScreenShots/Screenshot%202024-01-10%20at%201.59.19%20PM.png?raw=true)
+# Add New Task
+
+![App Screenshot](https://github.com/Dinesh7201/Todo_Keka/blob/main/ScreenShots/Screenshot%202024-01-10%20at%201.59.41%20PM.png?raw=true)
+# Add Due Date To Task
+
+![App Screenshot](https://github.com/Dinesh7201/Todo_Keka/blob/main/ScreenShots/Screenshot%202024-01-10%20at%202.36.16%20PM.png?raw=true)
+# View According to task priority
+
+![App Screenshot](https://github.com/Dinesh7201/Todo_Keka/blob/main/ScreenShots/Screenshot%202024-01-10%20at%202.36.28%20PM.png?raw=true)
+# View According to task status
+
+![App Screenshot](https://github.com/Dinesh7201/Todo_Keka/blob/main/ScreenShots/Screenshot%202024-01-10%20at%202.36.54%20PM.png?raw=true)
+# Search by Category
 
 # Getting Started
 
