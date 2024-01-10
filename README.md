@@ -10,9 +10,6 @@
 
 
 
-**To see Todo Application in action, simply click the video link below**
-
-*******************************************[Click here](https://drive.google.com/file/d/1TYk0rJVF6cPuAV-zZOPOfh4y3qau5R9I/view?usp=sharing)****************
 
 # Todo-Keka App
 # Todo_Keka: Your Ultimate Task Management Companion
