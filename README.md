@@ -1,4 +1,5 @@
-## Screenshots
+## Demo Video
+
 ## [YOUTUBE(Demo link)](https://youtu.be/TTw3d6T23Q0?si=9R4xWgaRfqvEDx_N)
 
 **Please check my above YOUTUBE link for better understanding of features in the project**
@@ -7,8 +8,7 @@
 
 ## [CLICK HERE](https://drive.google.com/file/d/1TYk0rJVF6cPuAV-zZOPOfh4y3qau5R9I/view?usp=sharing)
 
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
-## Demo
+
 
 **To see Todo Application in action, simply click the video link below**
 
