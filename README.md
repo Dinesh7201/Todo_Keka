@@ -353,5 +353,5 @@ To learn more about React Native, take a look at the following resources:
 ### Search by Category
 ![App Screenshot](https://github.com/Dinesh7201/Todo_Keka/blob/main/ScreenShots/Screenshot%202024-01-10%20at%202.36.54%20PM.png?raw=true )
 
-<img src=" https://github.com/Dinesh7201/Todo_Keka/blob/main/ScreenShots/Screenshot%202024-01-10%20at%202.36.54%20PM.png?raw=true " width="400" height="790">
+<img src=" (https://github.com/Dinesh7201/Todo_Keka/blob/main/ScreenShots/Screenshot%202024-01-10%20at%202.36.54%20PM.png?raw=true)https://github.com/Dinesh7201/Todo_Keka/blob/main/ScreenShots/Screenshot%202024-01-10%20at%202.36.54%20PM.png?raw=true " width="400" height="790">
 
