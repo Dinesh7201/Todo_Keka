@@ -335,7 +335,7 @@ To learn more about React Native, take a look at the following resources:
 ![App Screenshot](https://github.com/Dinesh7201/Todo_Keka/blob/main/ScreenShots/Screenshot%202024-01-10%20at%201.59.19%20PM.png?raw=true )
 
 # Add Due Date To Task
-![App Screenshot](https://github.com/Dinesh7201/Todo_Keka/blob/main/ScreenShots/Screenshot%202024-01-10%20at%201.59.41%20PM.png?raw=true | width=200)
+![App Screenshot](https://github.com/Dinesh7201/Todo_Keka/blob/main/ScreenShots/Screenshot%202024-01-10%20at%201.59.41%20PM.png?raw=true )
 
 # View According to task priority
 ![App Screenshot](https://github.com/Dinesh7201/Todo_Keka/blob/main/ScreenShots/Screenshot%202024-01-10%20at%202.36.16%20PM.png?raw=true)
