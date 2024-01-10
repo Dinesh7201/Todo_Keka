@@ -2,10 +2,9 @@
 This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
 ## Demo
 
-For Screen Recording of execution of app
+**To see Todo in action, simply click the video link below**
 
-https://drive.google.com/file/d/1TYk0rJVF6cPuAV-zZOPOfh4y3qau5R9I/view?usp=sharing
-
+*******************************************[Click here](https://drive.google.com/file/d/1TYk0rJVF6cPuAV-zZOPOfh4y3qau5R9I/view?usp=sharing)****************
 
 
 # Getting Started
@@ -91,9 +90,7 @@ To learn more about React Native, take a look at the following resources:
 - [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
 - [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
 - [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
-
-
-
+# Todo_Keka
 This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
 
 # Getting Started
@@ -204,8 +201,3 @@ To learn more about React Native, take a look at the following resources:
 
 ![App Screenshot](https://github.com/Dinesh7201/Todo_Keka/blob/main/ScreenShots/Screenshot%202024-01-10%20at%202.36.54%20PM.png?raw=true)
 # Search by Category
-
-# Todo_Keka
-
-
-
