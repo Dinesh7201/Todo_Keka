@@ -111,11 +111,11 @@ const ViewTask = ({ route }) => {
 
   return (
     <ImageBackground
-      source={require('/Users/apple/Desktop/Todo_Keka/assets/BackGround.png')}
+      source={require('/Users/apple/Desktop/new/Todo_Keka/assets/BackGround.png')}
       style={styles.container}
     >
       
-      <Image source={require('/Users/apple/Desktop/Todo_Keka/assets/logo.png')} style={styles.logo} />
+      <Image source={require('/Users/apple/Desktop/new/Todo_Keka/assets/logo.png')} style={styles.logo} />
       <Text style={styles.title}>Tasks</Text>
       <Text></Text>
 
